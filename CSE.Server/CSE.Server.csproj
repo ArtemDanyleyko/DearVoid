@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="System.Reactive" />
+    <None Remove="Common\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Reactive" Version="5.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Pages\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Common\TemplatedMessagePage.xaml" />
+    <Compile Remove="Pages\WelcomePage.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Pages\TemplatedMessagePage.xaml" />
+    <EmbeddedResource Include="Pages\WelcomePage.xaml" />
+  </ItemGroup>
+</Project>
