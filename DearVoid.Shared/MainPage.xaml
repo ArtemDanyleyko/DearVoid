@@ -8,6 +8,10 @@
     xmlns:vm="clr-namespace:DearVoid.ViewModels"
     mc:Ignorable="d">
     <Grid RowSpacing="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
@@ -45,33 +49,6 @@
                 Foreground="Black"
                 IsEnabled="{Binding CanSwitchPageForward}" />
         </StackPanel>
-        <ScrollViewer
-            x:Name="ConsoleScrollViewer"
-            Grid.Row="2"
-            Height="100"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Bottom"
-            ScrollbarFadingEnabled="False">
-            <TextBlock
-                x:Name="ConsoleTextBlock"
-                FontSize="14"
-                Text="{Binding ConsoleText}" />
-        </ScrollViewer>
-        <NavigationView
-            x:Name="MenuNavigationView"
-            Grid.RowSpan="3"
-            Foreground="White"
-            IsBackButtonVisible="Collapsed"
-            MenuItemsSource="{Binding Pages}"
-            SelectedItem="{Binding CurrentResponsePage}">
-            <NavigationView.MenuItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal" Spacing="10">
-                        <TextBlock Foreground="Black" Text="{Binding Index}" />
-                        <TextBlock Foreground="Black" Text="{Binding PageStatus}" />
-                    </StackPanel>
-                </DataTemplate>
-            </NavigationView.MenuItemTemplate>
-        </NavigationView>
+        <ListBox ItemsSource="{Binding Pages}" />
     </Grid>
 </Page>

@@ -1,71 +1,93 @@
 ﻿using System;
+using ClientProxy;
+using ClientProxy.Enums;
+using ClientProxy.Models;
 using CSE.Client.Models;
-using DearVoid.ViewModels;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Markup;
+using Windows.UI.Xaml.Navigation;
 
 namespace DearVoid
 {
-    public partial class MainPage : Page
+    public partial class MainPage : Page, IObserver<NavigationIntent>
     {
         private const int ConsoleScrollOffset = 50;
         private const string RadioButtonNameTemplate = "ChoiceRadioButton";
 
-        public MainViewModel ViewModel;
+        public Proxy proxy;
 
         public MainPage()
 		{
 			InitializeComponent();
         }
 
-        protected override void OnNavigatedTo(Windows.UI.Xaml.Navigation.NavigationEventArgs eventArgs)
+        public object CurrentPage { get; set; }
+
+        protected override void OnNavigatedTo(NavigationEventArgs eventArgs)
         {
             base.OnNavigatedTo(eventArgs);
 
             var user = eventArgs.Parameter as User;
-
-            ViewModel = new MainViewModel(user);
-            DataContext = ViewModel;
-            ViewModel.CurrentPageChanged += OnPageChanged;
-        }
-
-        private void OnPageChanged(object _, EventArgs __)
-        {
-            if (ViewModel?.CurrentResponsePage is null)
-            {
-                return;
-            }
-
-            foreach (var answer in ViewModel.CurrentResponsePage.)
-
-            for (var i = 0; i < ContentFrame.ChildCount; i++)
-            {
-                var radioButton = ContentFrame.Find($"{register}{nameof(RadioButton)}") as RadioButton;
-                if (radioButton is null)
-                {
-                    continue;
-                }
-
-                radioButton.Checked += (o, e) =>
-                {
-                    OnCheckedChanged();
-                };
-            }
+            proxy = new Proxy(user);
+            proxy.Subscribe(this);
         }
 
         private void OnSwitchForward(object _, RoutedEventArgs __)
         {
-            ViewModel.SwitchPageForward();
-        }
-
-        private void OnCheckedChanged()
-        {
-            ViewModel.ChangePageState();
+            proxy.SwitchForward();
         }
 
         private void OnSwitchBackward(object _, RoutedEventArgs __)
         {
-            ViewModel.SwitchPageBackward();
+            proxy.SwitchBackward();
+        }
+
+        public void OnNext(NavigationIntent value)
+        {
+            switch (value.NavigationType)
+            {
+                case NavigationType.Forward 
+                    when string.IsNullOrEmpty(value.XamlPage):
+                    {
+                        ContentFrame.GoForward();
+                        break;
+                    }
+
+                case NavigationType.Backward:
+                    {
+                        ContentFrame.GoBack();
+                        break;
+                    }
+
+                case NavigationType.Forward:
+                    {
+                        ContentFrame.ForwardStack.Add(new PageStackEntry(
+                            typeof(DummyPage),
+                            XamlReader.Load(value.XamlPage.ToString()),
+                            null));
+                        ForwardToEnd();
+                        break;
+                    }
+            }
+        }
+
+        private void ForwardToEnd()
+        {
+            while (ContentFrame.CanGoForward)
+            {
+                ContentFrame.GoForward();
+            }
+        }
+
+        public void OnError(Exception error)
+        {
+            
+        }
+
+        public void OnCompleted()
+        {
+            
         }
     }
 }

@@ -24,16 +24,17 @@ namespace CSE.Server
 
         private readonly Dictionary<IObserver<string>, IDisposable> _observers;
         private readonly string[] _pagesPaths;
+        private readonly Question[] _questions;
 
+        private int currentIndex;
         private CancellationTokenSource _cancellationTokenSource;
 
         private DummyServer()
         {
             _observers = new Dictionary<IObserver<string>, IDisposable>();
-            
+            _questions = Questionnaire.GetMockQuestionnaire();
             var currentAssembly = this.GetType().Assembly;
             _pagesPaths = currentAssembly.GetManifestResourceNames();
-            _questionnaire = Questionnaire
         }
 
         public static DummyServer Instance { get; } = new DummyServer();
@@ -50,7 +51,7 @@ namespace CSE.Server
 
             async Task NotifyAsync(CancellationToken token)
             {
-                for (var i = 0; i < questions.Count; i++)
+                while (currentIndex < _questions.Length)
                 {
                     if (token.IsCancellationRequested)
                     {
@@ -64,26 +65,47 @@ namespace CSE.Server
                         return;
                     }
 
-                    _observers.Keys.ToList().ForEach(item => item.OnNext(LoadNextPage(i)));
+                    currentIndex++;
+                    if (currentIndex == _questions.Length - 1)
+                    {
+                        return;
+                    }
+
+                    _observers.Keys.ToList().ForEach(item => item.OnNext(LoadNextPage(currentIndex)));
                 }
             }
         }
 
-        public string LoadNextPage(int index)
+        public void GetNextPage()
         {
-            var selectableButtonsStringBuilder = new StringBuilder();
+            currentIndex++;
+            if (currentIndex == _questions.Length - 1)
+            {
+                return;
+            }
 
-            foreach (var question in )
+            _observers.Keys.ToList().ForEach(item => item.OnNext(LoadNextPage(currentIndex)));
+        }
 
-
+        private string LoadNextPage(int index)
+        {
+            var question = Questionnaire.GetMockQuestionnaire()[index];
             var templatedMessagePageContentTemplate = LoadPageTemplate(TemplatedMessagePageName);
+
+            var radioButtons = new StringBuilder();
+            for(int i = 0; i < question.Answers.Length; i++)
+            {
+                radioButtons.Append(string.Format(
+                    SelectabeRadioButtonTemplate,
+                    i,
+                    question.Answers[i]));
+            }
+
             var templatedMessagePageContent = string.Format(
                 templatedMessagePageContentTemplate,
                 index.ToString(),
-                questions[index].Question,
-                questions[index].Answers[0].AnwerContent,
-                questions[index].Answers[1].AnwerContent,
-                questions[index].Answers[2].AnwerContent);
+                question.Text,
+                radioButtons);
 
             return templatedMessagePageContent;
         }

@@ -5,6 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="CSE.QuestionnaireHandler\**" />
+    <EmbeddedResource Remove="CSE.QuestionnaireHandler\**" />
+    <None Remove="CSE.QuestionnaireHandler\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 

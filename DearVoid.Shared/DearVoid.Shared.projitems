@@ -27,8 +27,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)DummyPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\ColorExtenisons.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NavigationParams\DummyPageNavigationParams.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Abstract\BaseViewModel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\MainViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Assets\SharedAssets.md" />

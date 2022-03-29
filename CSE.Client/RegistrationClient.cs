@@ -6,23 +6,20 @@ using CSE.Server;
 
 namespace CSE.Client
 {
-    public class RegistrationClient : IObserver<string>
+    public class RegistrationClient
     {
-        public RegistrationClient()
-        {
-        }
-
-        public async Task OnRegister(User user)
+        public async Task<string> OnRegister(User user, IObserver<string> observer)
         {
             try
             {
-                DummyServer.Instance.Subscribe(this);
+                DummyServer.Instance.Subscribe(observer);
                 var welcomePageContent = DummyServer.Instance.Start(user.UserName);
-
+                return welcomePageContent;
             }
             catch (Exception ex)
             {
                 SharedUI.DisplayError("Error", ex.Message, "OK");
+                return string.Empty;
             }
         }
 
@@ -36,9 +33,10 @@ namespace CSE.Client
             System.Diagnostics.Debug.WriteLine(error);
         }
 
-        public void OnNext(string value)
+        public void GetNextPage()
         {
-            AddNewPage(value);
+            DummyServer.Instance.GetNextPage();
         }
+            
     }
 }
