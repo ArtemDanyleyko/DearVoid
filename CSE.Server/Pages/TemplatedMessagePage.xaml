@@ -37,24 +37,7 @@
             VerticalAlignment="Bottom"
             Orientation="Vertical"
             Spacing="10">
-            <RadioButton
-                x:Name="FirstChoiceRadioButton"
-                Margin="5"
-                CheckedChanged="OnCheckedChanged"
-                Content="{2}"
-                GroupName="First Group" />
-            <RadioButton
-                x:Name="SecondChoiceRadioButton"
-                Margin="5"
-                CheckedChanged="OnCheckedChanged"
-                Content="{3}"
-                GroupName="First Group" />
-            <RadioButton
-                x:Name="ThirdChoiceRadioButton"
-                Margin="5"
-                CheckedChanged="OnCheckedChanged"
-                Content="{4}"
-                GroupName="First Group" />
+            {2}
         </StackPanel>
     </Grid>
 </Page>

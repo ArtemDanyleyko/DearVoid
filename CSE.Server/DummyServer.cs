@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,56 +14,36 @@ namespace CSE.Server
     {
         private const string TemplatedMessagePageName = "TemplatedMessagePage";
         private const string WelcomePageName = "WelcomePage";
+        private const string SelectabeRadioButtonTemplate = @"
+            <RadioButton
+                x:Name=""ChoiceRadioButton{0}""
+                Margin=""5""
+                CheckedChanged=""OnCheckedChanged""
+                Content=""{1}""
+                GroupName=""First Group"" />""";
 
-        private readonly Dictionary<IObserver<string>, IDisposable> observers;
-        private readonly string[] pagesPaths;
+        private readonly Dictionary<IObserver<string>, IDisposable> _observers;
+        private readonly string[] _pagesPaths;
 
-        private CancellationTokenSource cancellationTokenSource;
-        private List<TestQuestion> questions;
+        private CancellationTokenSource _cancellationTokenSource;
 
         private DummyServer()
         {
-            observers = new Dictionary<IObserver<string>, IDisposable>();
-            questions = new List<TestQuestion>()
-            {
-                new TestQuestion(
-                    "How many angles are in a triangle", 
-                    new List<Anwer>() 
-                    { 
-                        new Anwer(true, "3"), 
-                        new Anwer(false, "4"),  
-                        new Anwer(false, "5")
-                    }),
-                new TestQuestion(
-                    "How many corners are in a quadrilateral",
-                    new List<Anwer>()
-                    {
-                        new Anwer(false, "3"),
-                        new Anwer(true, "4"),
-                        new Anwer(false, "5")
-                    }),
-                new TestQuestion(
-                    "How many corners are in a pentagon",
-                    new List<Anwer>()
-                    {
-                        new Anwer(true, "This is confidential information"),
-                        new Anwer(false, "4"),
-                        new Anwer(true, "5")
-                    }),
-            };
-
+            _observers = new Dictionary<IObserver<string>, IDisposable>();
+            
             var currentAssembly = this.GetType().Assembly;
-            pagesPaths = currentAssembly.GetManifestResourceNames();
+            _pagesPaths = currentAssembly.GetManifestResourceNames();
+            _questionnaire = Questionnaire
         }
 
         public static DummyServer Instance { get; } = new DummyServer();
 
         public string Start(string userName)
         {
-            cancellationTokenSource?.Cancel();
-            cancellationTokenSource = new CancellationTokenSource();
+            _cancellationTokenSource?.Cancel();
+            _cancellationTokenSource = new CancellationTokenSource();
 
-            _ = NotifyAsync(cancellationTokenSource.Token);
+            _ = NotifyAsync(_cancellationTokenSource.Token);
 
             var welcomePageContentTemplate = LoadPageTemplate(WelcomePageName);
             return string.Format(welcomePageContentTemplate, userName);
@@ -83,13 +64,18 @@ namespace CSE.Server
                         return;
                     }
 
-                    observers.Keys.ToList().ForEach(item => item.OnNext(LoadNextPage(i)));
+                    _observers.Keys.ToList().ForEach(item => item.OnNext(LoadNextPage(i)));
                 }
             }
         }
 
         public string LoadNextPage(int index)
         {
+            var selectableButtonsStringBuilder = new StringBuilder();
+
+            foreach (var question in )
+
+
             var templatedMessagePageContentTemplate = LoadPageTemplate(TemplatedMessagePageName);
             var templatedMessagePageContent = string.Format(
                 templatedMessagePageContentTemplate,
@@ -104,7 +90,7 @@ namespace CSE.Server
 
         private string LoadPageTemplate(string templateName)
         {
-            var filePath = pagesPaths.FirstOrDefault(path => path.Contains(templateName));
+            var filePath = _pagesPaths.FirstOrDefault(path => path.Contains(templateName));
             var stream = GetType().Assembly.GetManifestResourceStream(filePath);
             using (var reader = new StreamReader(stream))
             {
@@ -114,18 +100,18 @@ namespace CSE.Server
 
         public void Stop()
         {
-            cancellationTokenSource?.Cancel();
+            _cancellationTokenSource?.Cancel();
         }
 
         public IDisposable Subscribe(IObserver<string> observer)
         {
-            if (observers.TryGetValue(observer, out var disposable))
+            if (_observers.TryGetValue(observer, out var disposable))
             {
                 return disposable;
             }
 
-            disposable = Disposable.Create(() => observers.Remove(observer));
-            observers.Add(observer, disposable);
+            disposable = Disposable.Create(() => _observers.Remove(observer));
+            _observers.Add(observer, disposable);
             return disposable;
         }
     }

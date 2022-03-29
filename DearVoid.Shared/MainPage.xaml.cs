@@ -1,7 +1,6 @@
-﻿using CSE.Client.Models;
+﻿using System;
+using CSE.Client.Models;
 using DearVoid.ViewModels;
-using System;
-using System.Collections.Generic;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -10,21 +9,13 @@ namespace DearVoid
     public partial class MainPage : Page
     {
         private const int ConsoleScrollOffset = 50;
+        private const string RadioButtonNameTemplate = "ChoiceRadioButton";
 
         public MainViewModel ViewModel;
-
-        private List<string> radioButtonsRegistry;
 
         public MainPage()
 		{
 			InitializeComponent();
-
-            radioButtonsRegistry = new List<string>()
-            {
-                "FirstChoice",
-                "SecondChoice",
-                "ThirdChoice"
-            };
         }
 
         protected override void OnNavigatedTo(Windows.UI.Xaml.Navigation.NavigationEventArgs eventArgs)
@@ -35,14 +26,21 @@ namespace DearVoid
 
             ViewModel = new MainViewModel(user);
             DataContext = ViewModel;
-            ViewModel.currentPageChanged += SubscribeRadioButtons;
+            ViewModel.CurrentPageChanged += OnPageChanged;
         }
 
-        private void SubscribeRadioButtons(object _, EventArgs __)
+        private void OnPageChanged(object _, EventArgs __)
         {
-            foreach (var register in radioButtonsRegistry)
+            if (ViewModel?.CurrentResponsePage is null)
             {
-                var radioButton = ContentFrame.FindName($"{register}{nameof(RadioButton)}") as RadioButton;
+                return;
+            }
+
+            foreach (var answer in ViewModel.CurrentResponsePage.)
+
+            for (var i = 0; i < ContentFrame.ChildCount; i++)
+            {
+                var radioButton = ContentFrame.Find($"{register}{nameof(RadioButton)}") as RadioButton;
                 if (radioButton is null)
                 {
                     continue;

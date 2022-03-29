@@ -13,7 +13,7 @@ namespace DearVoid.ViewModels
     {
         private readonly RegistrationClient registrationClient;
 
-        public event EventHandler currentPageChanged;
+        public event EventHandler CurrentPageChanged;
 
         public MainViewModel(User user)
         {
@@ -39,7 +39,7 @@ namespace DearVoid.ViewModels
             {
                 SetProperty(ref currentResponsePage, value);
                 CurrentPage = XamlReader.Load(currentResponsePage.XamlPage);
-                currentPageChanged?.Invoke(null, EventArgs.Empty);
+                CurrentPageChanged?.Invoke(null, EventArgs.Empty);
             } 
         }
 
