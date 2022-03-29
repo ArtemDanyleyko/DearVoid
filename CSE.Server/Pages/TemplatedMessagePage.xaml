@@ -19,16 +19,7 @@
             FontSize="20"
             FontWeight="SemiBold"
             Foreground="Black"
-            Text="{0}"
-            TextAlignment="Center"
-            TextWrapping="Wrap" />
-        <TextBlock
-            Grid.Row="1"
-            HorizontalAlignment="Stretch"
-            FontSize="17"
-            FontWeight="Normal"
-            Foreground="Black"
-            Text="{1}"
+            Text="Question number {0}"
             TextAlignment="Center"
             TextWrapping="Wrap" />
         <TextBlock
@@ -37,31 +28,33 @@
             FontSize="17"
             FontWeight="Normal"
             Foreground="Black"
-            Text="Here will be other dynamic content, some questionnaire or something like that"
+            Text="{1}"
             TextAlignment="Center"
             TextWrapping="Wrap" />
         <StackPanel
             Grid.Row="3"
             HorizontalAlignment="Center"
             VerticalAlignment="Bottom"
-            Orientation="Horizontal"
+            Orientation="Vertical"
             Spacing="10">
-            <Button
-                x:Name="BackwardButton"
-                Width="120"
-                Height="50"
-                Padding="10,0"
-                Background="Red"
-                Content="Backward"
-                Foreground="Black" />
-            <Button
-                x:Name="ForwardButton"
-                Width="120"
-                Height="50"
-                Padding="10,0"
-                Background="Blue"
-                Content="Forward"
-                Foreground="Black" />
+            <RadioButton
+                x:Name="FirstChoiceRadioButton"
+                Margin="5"
+                CheckedChanged="OnCheckedChanged"
+                Content="{2}"
+                GroupName="First Group" />
+            <RadioButton
+                x:Name="SecondChoiceRadioButton"
+                Margin="5"
+                CheckedChanged="OnCheckedChanged"
+                Content="{3}"
+                GroupName="First Group" />
+            <RadioButton
+                x:Name="ThirdChoiceRadioButton"
+                Margin="5"
+                CheckedChanged="OnCheckedChanged"
+                Content="{4}"
+                GroupName="First Group" />
         </StackPanel>
     </Grid>
 </Page>

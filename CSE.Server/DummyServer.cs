@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSE.Server.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,66 +14,97 @@ namespace CSE.Server
         private const string TemplatedMessagePageName = "TemplatedMessagePage";
         private const string WelcomePageName = "WelcomePage";
 
-        private readonly Dictionary<IObserver<string>, IDisposable> _observers;
+        private readonly Dictionary<IObserver<string>, IDisposable> observers;
+        private readonly string[] pagesPaths;
 
-        private readonly string[] _pagesPaths;
-
-        private CancellationTokenSource _cancellationTokenSource;
+        private CancellationTokenSource cancellationTokenSource;
+        private List<TestQuestion> questions;
 
         private DummyServer()
         {
-            _observers = new Dictionary<IObserver<string>, IDisposable>();
+            observers = new Dictionary<IObserver<string>, IDisposable>();
+            questions = new List<TestQuestion>()
+            {
+                new TestQuestion(
+                    "How many angles are in a triangle", 
+                    new List<Anwer>() 
+                    { 
+                        new Anwer(true, "3"), 
+                        new Anwer(false, "4"),  
+                        new Anwer(false, "5")
+                    }),
+                new TestQuestion(
+                    "How many corners are in a quadrilateral",
+                    new List<Anwer>()
+                    {
+                        new Anwer(false, "3"),
+                        new Anwer(true, "4"),
+                        new Anwer(false, "5")
+                    }),
+                new TestQuestion(
+                    "How many corners are in a pentagon",
+                    new List<Anwer>()
+                    {
+                        new Anwer(true, "This is confidential information"),
+                        new Anwer(false, "4"),
+                        new Anwer(true, "5")
+                    }),
+            };
 
             var currentAssembly = this.GetType().Assembly;
-            _pagesPaths = currentAssembly.GetManifestResourceNames();
+            pagesPaths = currentAssembly.GetManifestResourceNames();
         }
 
         public static DummyServer Instance { get; } = new DummyServer();
 
         public string Start(string userName)
         {
-            _cancellationTokenSource?.Cancel();
-            _cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource?.Cancel();
+            cancellationTokenSource = new CancellationTokenSource();
 
-            _ = NotifyAsync(_cancellationTokenSource.Token);
+            _ = NotifyAsync(cancellationTokenSource.Token);
 
             var welcomePageContentTemplate = LoadPageTemplate(WelcomePageName);
             return string.Format(welcomePageContentTemplate, userName);
 
             async Task NotifyAsync(CancellationToken token)
             {
-                if (token.IsCancellationRequested)
+                for (var i = 0; i < questions.Count; i++)
                 {
-                    return;
+                    if (token.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
+                    await Task.Delay(TimeSpan.FromSeconds(10));
+
+                    if (token.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
+                    observers.Keys.ToList().ForEach(item => item.OnNext(LoadNextPage(i)));
                 }
-
-                await Task.Delay(TimeSpan.FromSeconds(10));
-
-                if (token.IsCancellationRequested)
-                {
-                    return;
-                }
-
-                _observers.Keys.ToList().ForEach(item => item.OnNext(LoadNextPage()));
-
-                await NotifyAsync(token);
             }
         }
 
-        public string LoadNextPage()
+        public string LoadNextPage(int index)
         {
             var templatedMessagePageContentTemplate = LoadPageTemplate(TemplatedMessagePageName);
             var templatedMessagePageContent = string.Format(
                 templatedMessagePageContentTemplate,
-                $"Here will be some dynamic title ({DateTime.Now:u})",
-                $"Here will be some dynamic description ({DateTime.Now:u})");
+                index.ToString(),
+                questions[index].Question,
+                questions[index].Answers[0].AnwerContent,
+                questions[index].Answers[1].AnwerContent,
+                questions[index].Answers[2].AnwerContent);
 
             return templatedMessagePageContent;
         }
 
         private string LoadPageTemplate(string templateName)
         {
-            var filePath = _pagesPaths.FirstOrDefault(path => path.Contains(templateName));
+            var filePath = pagesPaths.FirstOrDefault(path => path.Contains(templateName));
             var stream = GetType().Assembly.GetManifestResourceStream(filePath);
             using (var reader = new StreamReader(stream))
             {
@@ -82,18 +114,18 @@ namespace CSE.Server
 
         public void Stop()
         {
-            _cancellationTokenSource?.Cancel();
+            cancellationTokenSource?.Cancel();
         }
 
         public IDisposable Subscribe(IObserver<string> observer)
         {
-            if (_observers.TryGetValue(observer, out var disposable))
+            if (observers.TryGetValue(observer, out var disposable))
             {
                 return disposable;
             }
 
-            disposable = Disposable.Create(() => _observers.Remove(observer));
-            _observers.Add(observer, disposable);
+            disposable = Disposable.Create(() => observers.Remove(observer));
+            observers.Add(observer, disposable);
             return disposable;
         }
     }

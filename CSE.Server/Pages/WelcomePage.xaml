@@ -27,7 +27,7 @@
             FontSize="17"
             FontWeight="SemiBold"
             Foreground="Black"
-            Text="Every 5 minutes you can see new slide on the screen. You are welcome :)"
+            Text="Every 15 seconds a new question will come from the server. Time has begun. You are welcome :)"
             TextAlignment="Center"
             TextWrapping="Wrap" />
     </Grid>

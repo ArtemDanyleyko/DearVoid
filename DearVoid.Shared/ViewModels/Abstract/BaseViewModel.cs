@@ -9,12 +9,16 @@ namespace DearVoid.ViewModels.Abstract
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected bool SetProperty<T>(ref T backingStore, T value,
+        protected bool SetProperty<T>(
+            ref T backingStore,
+            T value,
             [CallerMemberName] string propertyName = "",
             Action onChanged = null)
         {
             if (EqualityComparer<T>.Default.Equals(backingStore, value))
+            {
                 return false;
+            }
 
             backingStore = value;
             onChanged?.Invoke();
@@ -22,18 +26,17 @@ namespace DearVoid.ViewModels.Abstract
             return true;
         }
 
-        protected void RaiseProperty(string propertyName)
+        protected void RaiseProperties(params string[] propertyNames)
         {
-            OnPropertyChanged(propertyName);
+            foreach(var name in propertyNames)
+            {
+                OnPropertyChanged(name);
+            }
         }
 
         protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            var changed = PropertyChanged;
-            if (changed == null)
-                return;
-
-            changed.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

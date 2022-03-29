@@ -7,13 +7,17 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:DearVoid.ViewModels"
     mc:Ignorable="d">
-    <Grid Margin="20,30" RowSpacing="20">
+    <Grid RowSpacing="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Frame x:Name="ContentFrame" Content="{Binding CurrentPage}" />
+        <Frame
+            x:Name="ContentFrame"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Stretch"
+            Content="{Binding CurrentPage}" />
         <StackPanel
             Grid.Row="1"
             HorizontalAlignment="Center"
@@ -45,6 +49,7 @@
             x:Name="ConsoleScrollViewer"
             Grid.Row="2"
             Height="100"
+            HorizontalAlignment="Center"
             VerticalAlignment="Bottom"
             ScrollbarFadingEnabled="False">
             <TextBlock
@@ -52,5 +57,21 @@
                 FontSize="14"
                 Text="{Binding ConsoleText}" />
         </ScrollViewer>
+        <NavigationView
+            x:Name="MenuNavigationView"
+            Grid.RowSpan="3"
+            Foreground="White"
+            IsBackButtonVisible="Collapsed"
+            MenuItemsSource="{Binding Pages}"
+            SelectedItem="{Binding CurrentResponsePage}">
+            <NavigationView.MenuItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Foreground="Black" Text="{Binding Index}" />
+                        <TextBlock Foreground="Black" Text="{Binding PageStatus}" />
+                    </StackPanel>
+                </DataTemplate>
+            </NavigationView.MenuItemTemplate>
+        </NavigationView>
     </Grid>
 </Page>

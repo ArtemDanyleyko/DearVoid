@@ -1,8 +1,10 @@
 ﻿using CSE.Client;
+using CSE.Client.Enums;
 using CSE.Client.Models;
 using DearVoid.ViewModels.Abstract;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Windows.UI.Xaml.Markup;
 
 namespace DearVoid.ViewModels
@@ -11,6 +13,8 @@ namespace DearVoid.ViewModels
     {
         private readonly RegistrationClient registrationClient;
 
+        public event EventHandler currentPageChanged;
+
         public MainViewModel(User user)
         {
             registrationClient = new RegistrationClient();
@@ -18,24 +22,24 @@ namespace DearVoid.ViewModels
             _ = registrationClient.OnRegister(user);
             Pages = registrationClient.Pages;
             Pages.CollectionChanged += OnReceivedNewPage;
-            CurrentStringPage = Pages[0];
+            CurrentResponsePage = Pages[0];
         }
 
+        public ObservableCollection<ResponsePage> Pages { get; }
 
-        public ObservableCollection<string> Pages { get; }
+        public bool CanSwitchPageForward => CurrentResponsePage.Index < Pages.Last().Index;
 
-        public bool CanSwitchPageForward => Pages.IndexOf(currentStringPage) < Pages.Count - 1;
+        public bool CanSwitchPageBackward => CurrentResponsePage.Index > 0;
 
-        public bool CanSwitchPageBackward => Pages.IndexOf(currentStringPage) > 0;
-
-        private string currentStringPage;
-        public string CurrentStringPage
+        private ResponsePage currentResponsePage;
+        public ResponsePage CurrentResponsePage
         {
-            get => currentStringPage;
+            get => currentResponsePage;
             set 
             {
-                SetProperty(ref currentStringPage, value);
-                CurrentPage = XamlReader.Load(currentStringPage);
+                SetProperty(ref currentResponsePage, value);
+                CurrentPage = XamlReader.Load(currentResponsePage.XamlPage);
+                currentPageChanged?.Invoke(null, EventArgs.Empty);
             } 
         }
 
@@ -56,6 +60,17 @@ namespace DearVoid.ViewModels
             }
         }
 
+        public void SwitchPageByIndex(int index)
+        {
+            if (!CanSwitchPageForward)
+            {
+                return;
+            }
+
+            CurrentResponsePage = Pages[index];
+            RaiseProperties(nameof(CanSwitchPageForward), nameof(CanSwitchPageBackward));
+        }
+
         public void SwitchPageForward()
         {
             if (!CanSwitchPageForward)
@@ -63,9 +78,8 @@ namespace DearVoid.ViewModels
                 return;
             }
 
-            CurrentStringPage = Pages[Pages.IndexOf(CurrentStringPage) + 1];
-            RaiseProperty(nameof(CanSwitchPageForward));
-            RaiseProperty(nameof(CanSwitchPageBackward));
+            CurrentResponsePage = Pages[Pages.IndexOf(CurrentResponsePage) + 1];
+            RaiseProperties(nameof(CanSwitchPageForward), nameof(CanSwitchPageBackward));
         }
 
         public void SwitchPageBackward()
@@ -75,17 +89,19 @@ namespace DearVoid.ViewModels
                 return;
             }
 
-            CurrentStringPage = Pages[Pages.IndexOf(CurrentStringPage) - 1];
-            RaiseProperty(nameof(CanSwitchPageForward));
-            RaiseProperty(nameof(CanSwitchPageBackward));
+            CurrentResponsePage = Pages[Pages.IndexOf(CurrentResponsePage) - 1];
+            RaiseProperties(nameof(CanSwitchPageForward), nameof(CanSwitchPageBackward));
+        }
+
+        public void ChangePageState()
+        {
+            CurrentResponsePage.PageStatus = PageStatus.PendingSend;
         }
 
         private void OnReceivedNewPage(object _, System.Collections.Specialized.NotifyCollectionChangedEventArgs __)
         {
             ConsoleText += $"{Environment.NewLine} New page received, total page {registrationClient.Pages.Count}";
-
-            RaiseProperty(nameof(CanSwitchPageForward));
-            RaiseProperty(nameof(CanSwitchPageBackward));
+            RaiseProperties(nameof(CanSwitchPageForward), nameof(CanSwitchPageBackward));
         }
     }
 }

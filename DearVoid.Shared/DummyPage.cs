@@ -24,7 +24,7 @@ namespace DearVoid
             foreach (var kv in buttonsActions)
             {
                 var button = page.FindName($"{kv.Key}{nameof(Button)}") as Button;
-                if (button == null)
+                if (button is null)
                 {
                     continue;
                 }
