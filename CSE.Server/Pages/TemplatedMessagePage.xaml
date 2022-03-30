@@ -19,7 +19,7 @@
             FontSize="20"
             FontWeight="SemiBold"
             Foreground="Black"
-            Text="Question number {0}"
+            Text="Question {0}"
             TextAlignment="Center"
             TextWrapping="Wrap" />
         <TextBlock

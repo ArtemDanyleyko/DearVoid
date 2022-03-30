@@ -5,43 +5,48 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Threading.Tasks;
 
 namespace ClientProxy
 {
     public class Proxy : IObserver<string>, IObservable<NavigationIntent>, IObservable<string>
     {
-        private readonly RegistrationClient registrationClient;
+        private readonly RegistrationClient _registrationClient;
         private readonly Dictionary<IObserver<NavigationIntent>, IDisposable> _navigationObservers;
         private readonly Dictionary<IObserver<string>, IDisposable> _pageObservers;
 
-        private int currentPosition;
-        private Dictionary<int, string> pagesStatuses;
+        private int _currentPosition;
+        private Dictionary<int, string> _pagesStatuses;
 
-        public Proxy(User user)
+        public Proxy()
         {
-            registrationClient = new RegistrationClient();
+            _registrationClient = new RegistrationClient();
             _navigationObservers = new Dictionary<IObserver<NavigationIntent>, IDisposable>();
             _pageObservers = new Dictionary<IObserver<string>, IDisposable>();
-            pagesStatuses = new Dictionary<int, string>();
-            _ = registrationClient.OnRegister(user, this);
+            _pagesStatuses = new Dictionary<int, string>();
+        }
+
+        public Task<string> RegisterAsync(User user)
+        {
+            return _registrationClient.OnRegister(user, this);
         }
 
         public void SwitchForward()
         {
-            if (pagesStatuses.Count - 1 == currentPosition || pagesStatuses.Count == 0)
+            if (_pagesStatuses.Count - 1 == _currentPosition || _pagesStatuses.Count == 0)
             {
-                registrationClient.GetNextPage();
+                _registrationClient.GetNextPage();
                 return;
             }
 
             _navigationObservers.Keys.ToList().ForEach(item => item.OnNext(NavigationIntent.Forward()));
-            currentPosition++;
+            _currentPosition++;
         }
 
         public void SwitchBackward()
         {
             _navigationObservers.Keys.ToList().ForEach(item => item.OnNext(NavigationIntent.Backward()));
-            currentPosition--;
+            _currentPosition--;
         }
 
         public void OnCompleted()
@@ -56,8 +61,8 @@ namespace ClientProxy
         public void OnNext(string value)
         {
             _navigationObservers.Keys.ToList().ForEach(item => item.OnNext(NavigationIntent.Forward(value)));
-            pagesStatuses.Add(pagesStatuses.Count, null);
-            currentPosition = pagesStatuses.Count - 1;
+            _pagesStatuses.Add(_pagesStatuses.Count, null);
+            _currentPosition = _pagesStatuses.Count - 1;
         }
 
         public IDisposable Subscribe(IObserver<NavigationIntent> observer)

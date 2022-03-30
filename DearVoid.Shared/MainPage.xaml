@@ -5,7 +5,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="clr-namespace:DearVoid.ViewModels"
     mc:Ignorable="d">
     <Grid RowSpacing="20">
         <Grid.ColumnDefinitions>
@@ -20,8 +19,7 @@
         <Frame
             x:Name="ContentFrame"
             HorizontalAlignment="Center"
-            VerticalAlignment="Stretch"
-            Content="{Binding CurrentPage}" />
+            VerticalAlignment="Stretch" />
         <StackPanel
             Grid.Row="1"
             HorizontalAlignment="Center"
@@ -35,9 +33,8 @@
                 Padding="10,0"
                 Background="Red"
                 Click="OnSwitchBackward"
-                Content="Backward"
-                Foreground="Black"
-                IsEnabled="{Binding CanSwitchPageBackward}" />
+                Content="Previous"
+                Foreground="Black" />
             <Button
                 x:Name="ForwardButton"
                 Width="120"
@@ -45,10 +42,14 @@
                 Padding="10,0"
                 Background="Blue"
                 Click="OnSwitchForward"
-                Content="Forward"
-                Foreground="Black"
-                IsEnabled="{Binding CanSwitchPageForward}" />
+                Content="Next"
+                Foreground="Black" />
         </StackPanel>
-        <ListBox ItemsSource="{Binding Pages}" />
+        <ListBox
+            Grid.RowSpan="3"
+            Grid.Column="1"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Background="Gray" />
     </Grid>
 </Page>

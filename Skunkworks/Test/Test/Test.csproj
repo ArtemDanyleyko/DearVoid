@@ -13,6 +13,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\CSE.Client\CSE.Client.csproj" />
+    <ProjectReference Include="..\..\..\CSE.Server\CSE.Server.csproj" />
+    <ProjectReference Include="..\..\..\ClientProxy\ClientProxy.csproj" />
   </ItemGroup>
 
   <ItemGroup>

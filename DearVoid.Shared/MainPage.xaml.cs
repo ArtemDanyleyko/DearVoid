@@ -24,23 +24,16 @@ namespace DearVoid
 
         public object CurrentPage { get; set; }
 
-        protected override void OnNavigatedTo(NavigationEventArgs eventArgs)
+        protected override async void OnNavigatedTo(NavigationEventArgs eventArgs)
         {
             base.OnNavigatedTo(eventArgs);
 
             var user = eventArgs.Parameter as User;
-            proxy = new Proxy(user);
+            proxy = new Proxy();
             proxy.Subscribe(this);
-        }
 
-        private void OnSwitchForward(object _, RoutedEventArgs __)
-        {
-            proxy.SwitchForward();
-        }
-
-        private void OnSwitchBackward(object _, RoutedEventArgs __)
-        {
-            proxy.SwitchBackward();
+            var startupPage = await proxy.RegisterAsync(user);
+            ContentFrame.Content = XamlReader.Load(startupPage);
         }
 
         public void OnNext(NavigationIntent value)
@@ -72,14 +65,6 @@ namespace DearVoid
             }
         }
 
-        private void ForwardToEnd()
-        {
-            while (ContentFrame.CanGoForward)
-            {
-                ContentFrame.GoForward();
-            }
-        }
-
         public void OnError(Exception error)
         {
             
@@ -89,5 +74,24 @@ namespace DearVoid
         {
             
         }
+
+        private void OnSwitchForward(object _, RoutedEventArgs __)
+        {
+            proxy.SwitchForward();
+        }
+
+        private void OnSwitchBackward(object _, RoutedEventArgs __)
+        {
+            proxy.SwitchBackward();
+        }
+
+        private void ForwardToEnd()
+        {
+            while (ContentFrame.CanGoForward)
+            {
+                ContentFrame.GoForward();
+            }
+        }
+
     }
 }

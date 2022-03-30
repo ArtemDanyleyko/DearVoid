@@ -8,16 +8,17 @@ namespace CSE.Client
 {
     public class RegistrationClient
     {
-        public async Task OnRegister(User user, IObserver<string> observer)
+        public async Task<string> OnRegister(User user, IObserver<string> observer)
         {
             try
             {
                 DummyServer.Instance.Subscribe(observer);
-                DummyServer.Instance.Start(user.UserName);
+                return DummyServer.Instance.Start(user.UserName);
             }
             catch (Exception ex)
             {
                 SharedUI.DisplayError("Error", ex.Message, "OK");
+                return null;
             }
         }
 

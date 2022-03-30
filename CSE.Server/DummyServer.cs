@@ -26,32 +26,33 @@ namespace CSE.Server
         private readonly string[] _pagesPaths;
         private readonly Question[] _questions;
 
-        private int currentIndex;
+        private int _currentIndex;
         private CancellationTokenSource _cancellationTokenSource;
 
         private DummyServer()
         {
             _observers = new Dictionary<IObserver<string>, IDisposable>();
             _questions = Questionnaire.GetMockQuestionnaire();
+
             var currentAssembly = this.GetType().Assembly;
             _pagesPaths = currentAssembly.GetManifestResourceNames();
         }
 
         public static DummyServer Instance { get; } = new DummyServer();
 
-        public void Start(string userName)
+        public string Start(string userName)
         {
             _cancellationTokenSource?.Cancel();
             _cancellationTokenSource = new CancellationTokenSource();
 
             _ = NotifyAsync(_cancellationTokenSource.Token);
 
-            //var welcomePageContentTemplate = string.Format(LoadPageTemplate(WelcomePageName), userName);
-            //_observers.Keys.ToList().ForEach(item => item.OnNext(welcomePageContentTemplate));
+            var welcomePageContentTemplate = string.Format(LoadPageTemplate(WelcomePageName), userName);
+            return welcomePageContentTemplate;
 
             async Task NotifyAsync(CancellationToken token)
             {
-                while (currentIndex < _questions.Length)
+                while (_currentIndex < _questions.Length)
                 {
                     if (token.IsCancellationRequested)
                     {
@@ -65,26 +66,26 @@ namespace CSE.Server
                         return;
                     }
                     
-                    if (currentIndex == _questions.Length)
+                    if (_currentIndex == _questions.Length)
                     {
                         return;
                     }
 
-                    _observers.Keys.ToList().ForEach(item => item.OnNext(LoadNextPage(currentIndex)));
-                    currentIndex++;
+                    _observers.Keys.ToList().ForEach(item => item.OnNext(LoadNextPage(_currentIndex)));
+                    _currentIndex++;
                 }
             }
         }
 
         public void GetNextPage()
         {
-            if (currentIndex == _questions.Length)
+            if (_currentIndex == _questions.Length)
             {
                 return;
             }
 
-            _observers.Keys.ToList().ForEach(item => item.OnNext(LoadNextPage(currentIndex)));
-            currentIndex++;
+            _observers.Keys.ToList().ForEach(item => item.OnNext(LoadNextPage(_currentIndex)));
+            _currentIndex++;
         }
 
         private string LoadNextPage(int index)
@@ -101,9 +102,10 @@ namespace CSE.Server
                     question.Answers[i]));
             }
 
+            var pageNumber = index + 1;
             var templatedMessagePageContent = string.Format(
                 templatedMessagePageContentTemplate,
-                index.ToString(),
+                pageNumber,
                 question.Text,
                 radioButtons);
 

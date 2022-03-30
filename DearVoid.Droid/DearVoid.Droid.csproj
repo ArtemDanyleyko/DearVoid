@@ -103,13 +103,14 @@
     <AndroidResource Include="Resources\values\Styles.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ClientProxy\ClientProxy.csproj">
-      <Project>{E12F7532-7A86-4BC6-BF67-B938439F5837}</Project>
-      <Name>ClientProxy</Name>
-    </ProjectReference>
     <ProjectReference Include="..\CSE.Client\CSE.Client.csproj">
       <Project>{7e987b5a-ea5d-4f40-9f80-360bce120834}</Project>
       <Name>CSE.Client</Name>
+      <ReferenceSourceTarget></ReferenceSourceTarget>
+    </ProjectReference>
+    <ProjectReference Include="..\ClientProxy\ClientProxy.csproj">
+      <Project>{E12F7532-7A86-4BC6-BF67-B938439F5837}</Project>
+      <Name>ClientProxy</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="..\DearVoid.Shared\DearVoid.Shared.projitems" Label="Shared" />
