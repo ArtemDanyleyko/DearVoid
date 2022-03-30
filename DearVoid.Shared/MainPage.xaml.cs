@@ -63,7 +63,7 @@ namespace DearVoid
                 case NavigationType.Forward:
                     {
                         ContentFrame.ForwardStack.Add(new PageStackEntry(
-                            typeof(DummyPage),
+                            typeof(FramePage),
                             XamlReader.Load(value.XamlPage.ToString()),
                             null));
                         ForwardToEnd();
