@@ -22,24 +22,26 @@ namespace ClientProxy
             registrationClient = new RegistrationClient();
             _navigationObservers = new Dictionary<IObserver<NavigationIntent>, IDisposable>();
             _pageObservers = new Dictionary<IObserver<string>, IDisposable>();
-
+            pagesStatuses = new Dictionary<int, string>();
             _ = registrationClient.OnRegister(user, this);
         }
 
         public void SwitchForward()
         {
-            if (pagesStatuses.Count - 1 == currentPosition)
+            if (pagesStatuses.Count - 1 == currentPosition || pagesStatuses.Count == 0)
             {
                 registrationClient.GetNextPage();
                 return;
             }
 
             _navigationObservers.Keys.ToList().ForEach(item => item.OnNext(NavigationIntent.Forward()));
+            currentPosition++;
         }
 
         public void SwitchBackward()
         {
             _navigationObservers.Keys.ToList().ForEach(item => item.OnNext(NavigationIntent.Backward()));
+            currentPosition--;
         }
 
         public void OnCompleted()

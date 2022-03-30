@@ -39,15 +39,15 @@ namespace CSE.Server
 
         public static DummyServer Instance { get; } = new DummyServer();
 
-        public string Start(string userName)
+        public void Start(string userName)
         {
             _cancellationTokenSource?.Cancel();
             _cancellationTokenSource = new CancellationTokenSource();
 
             _ = NotifyAsync(_cancellationTokenSource.Token);
 
-            var welcomePageContentTemplate = LoadPageTemplate(WelcomePageName);
-            return string.Format(welcomePageContentTemplate, userName);
+            //var welcomePageContentTemplate = string.Format(LoadPageTemplate(WelcomePageName), userName);
+            //_observers.Keys.ToList().ForEach(item => item.OnNext(welcomePageContentTemplate));
 
             async Task NotifyAsync(CancellationToken token)
             {
@@ -58,33 +58,33 @@ namespace CSE.Server
                         return;
                     }
 
-                    await Task.Delay(TimeSpan.FromSeconds(10));
+                    await Task.Delay(TimeSpan.FromSeconds(15));
 
                     if (token.IsCancellationRequested)
                     {
                         return;
                     }
-
-                    currentIndex++;
-                    if (currentIndex == _questions.Length - 1)
+                    
+                    if (currentIndex == _questions.Length)
                     {
                         return;
                     }
 
                     _observers.Keys.ToList().ForEach(item => item.OnNext(LoadNextPage(currentIndex)));
+                    currentIndex++;
                 }
             }
         }
 
         public void GetNextPage()
         {
-            currentIndex++;
-            if (currentIndex == _questions.Length - 1)
+            if (currentIndex == _questions.Length)
             {
                 return;
             }
 
             _observers.Keys.ToList().ForEach(item => item.OnNext(LoadNextPage(currentIndex)));
+            currentIndex++;
         }
 
         private string LoadNextPage(int index)
