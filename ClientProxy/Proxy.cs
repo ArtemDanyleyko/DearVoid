@@ -31,6 +31,11 @@ namespace ClientProxy
             return _registrationClient.OnRegister(user, this);
         }
 
+        public void StartTest()
+        {
+            _registrationClient.StartTest();
+        }
+
         public void SwitchForward()
         {
             if (_pagesStatuses.Count - 1 == _currentPosition || _pagesStatuses.Count == 0)

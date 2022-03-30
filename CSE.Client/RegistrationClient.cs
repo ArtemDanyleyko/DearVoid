@@ -22,6 +22,11 @@ namespace CSE.Client
             }
         }
 
+        public void StartTest()
+        {
+            DummyServer.Instance.StartTimer();
+        }
+
         public void OnCompleted()
         {
 

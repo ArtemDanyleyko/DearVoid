@@ -40,15 +40,12 @@ namespace CSE.Server
 
         public static DummyServer Instance { get; } = new DummyServer();
 
-        public string Start(string userName)
+        public void StartTimer()
         {
             _cancellationTokenSource?.Cancel();
             _cancellationTokenSource = new CancellationTokenSource();
 
             _ = NotifyAsync(_cancellationTokenSource.Token);
-
-            var welcomePageContentTemplate = string.Format(LoadPageTemplate(WelcomePageName), userName);
-            return welcomePageContentTemplate;
 
             async Task NotifyAsync(CancellationToken token)
             {
@@ -65,7 +62,7 @@ namespace CSE.Server
                     {
                         return;
                     }
-                    
+
                     if (_currentIndex == _questions.Length)
                     {
                         return;
@@ -76,6 +73,9 @@ namespace CSE.Server
                 }
             }
         }
+
+        public string Start(string userName)
+            => string.Format(LoadPageTemplate(WelcomePageName), userName);
 
         public void GetNextPage()
         {

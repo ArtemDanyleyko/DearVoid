@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using ClientProxy;
 using ClientProxy.Enums;
 using ClientProxy.Models;
+using CSE.Client.Enums;
 using CSE.Client.Models;
+using DearVoid.NavigationParams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Markup;
@@ -15,11 +19,19 @@ namespace DearVoid
         private const int ConsoleScrollOffset = 50;
         private const string RadioButtonNameTemplate = "ChoiceRadioButton";
 
+        private Dictionary<string, Action<int>> _radioButtonsActionsRegistry;
+
         public Proxy proxy;
 
         public MainPage()
 		{
 			InitializeComponent();
+            _radioButtonsActionsRegistry = new Dictionary<string, Action<int>>()
+            {
+                ["ChoiceRadioButton0"] = ChangepageState,
+                ["ChoiceRadioButton1"] = ChangepageState,
+                ["ChoiceRadioButton2"] = ChangepageState
+            };
         }
 
         public object CurrentPage { get; set; }
@@ -31,7 +43,6 @@ namespace DearVoid
             var user = eventArgs.Parameter as User;
             proxy = new Proxy();
             proxy.Subscribe(this);
-
             var startupPage = await proxy.RegisterAsync(user);
             ContentFrame.Content = XamlReader.Load(startupPage);
         }
@@ -55,11 +66,20 @@ namespace DearVoid
 
                 case NavigationType.Forward:
                     {
+                        var navigateParam = new DummyPageNavigationParams(
+                            XamlReader.Load(value.XamlPage.ToString()),
+                            _radioButtonsActionsRegistry,
+                            PageStatesListBox.Items.Count);
+
                         ContentFrame.ForwardStack.Add(new PageStackEntry(
                             typeof(FramePage),
-                            XamlReader.Load(value.XamlPage.ToString()),
+                            navigateParam,
                             null));
+
                         ForwardToEnd();
+                      
+                        var text = $"Page number {PageStatesListBox.Items.Count + 1}. State: {PageStatus.NotAnswered}";
+                        PageStatesListBox.Items.Add(new TextBlock() { Text = text });
                         break;
                     }
             }
@@ -75,6 +95,13 @@ namespace DearVoid
             
         }
 
+        private async void OnStart(object button, RoutedEventArgs __)
+        {
+            proxy.StartTest();
+            StartButton.Visibility = Visibility.Collapsed;
+            NavigationStackPanel.Visibility = Visibility.Visible;
+        }
+
         private void OnSwitchForward(object _, RoutedEventArgs __)
         {
             proxy.SwitchForward();
@@ -85,6 +112,19 @@ namespace DearVoid
             proxy.SwitchBackward();
         }
 
+        private void ChangepageState(int index)
+        {
+            if(PageStatesListBox.Items.Count <= index)
+            {
+                return;
+            }
+
+            var statusItem = PageStatesListBox.Items[index] as TextBlock;
+            var startRemoveIndex = statusItem.Text.IndexOf("State: ");
+            statusItem.Text = statusItem.Text.Remove(startRemoveIndex);
+            statusItem.Text += $"{PageStatus.PendingSend}";
+        }
+
         private void ForwardToEnd()
         {
             while (ContentFrame.CanGoForward)
@@ -92,6 +132,5 @@ namespace DearVoid
                 ContentFrame.GoForward();
             }
         }
-
     }
 }

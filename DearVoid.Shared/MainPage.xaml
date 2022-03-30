@@ -20,12 +20,26 @@
             x:Name="ContentFrame"
             HorizontalAlignment="Center"
             VerticalAlignment="Stretch" />
+        <Button
+            x:Name="StartButton"
+            Grid.Row="1"
+            Width="120"
+            Height="50"
+            Padding="10,0"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Bottom"
+            Background="Red"
+            Click="OnStart"
+            Content="Start"
+            Foreground="Black" />
         <StackPanel
+            x:Name="NavigationStackPanel"
             Grid.Row="1"
             HorizontalAlignment="Center"
             VerticalAlignment="Bottom"
             Orientation="Horizontal"
-            Spacing="10">
+            Spacing="10"
+            Visibility="Collapsed">
             <Button
                 x:Name="BackwardButton"
                 Width="120"
@@ -45,11 +59,15 @@
                 Content="Next"
                 Foreground="Black" />
         </StackPanel>
-        <ListBox
+        <StackPanel
             Grid.RowSpan="3"
             Grid.Column="1"
-            HorizontalAlignment="Stretch"
-            VerticalAlignment="Stretch"
-            Background="Gray" />
+            Background="Gray">
+            <ListBox
+                x:Name="PageStatesListBox"
+                Padding="10"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch" />
+        </StackPanel>
     </Grid>
 </Page>
